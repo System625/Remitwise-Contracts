@@ -1,7 +1,7 @@
 #![no_std]
 use soroban_sdk::{
-    contract, contractimpl, contracttype, symbol_short, token::TokenClient, vec, Address, Env, Symbol,
-    Vec,
+    contract, contractimpl, contracttype, symbol_short, token::TokenClient, vec, Address, Env,
+    Symbol, Vec,
 };
 
 #[derive(Clone)]
@@ -9,6 +9,15 @@ use soroban_sdk::{
 pub struct Allocation {
     pub category: Symbol,
     pub amount: i128,
+}
+
+#[derive(Clone)]
+#[contracttype]
+pub struct AccountGroup {
+    pub spending: Address,
+    pub savings: Address,
+    pub bills: Address,
+    pub insurance: Address,
 }
 
 #[contract]
@@ -69,10 +78,7 @@ impl RemittanceSplit {
         env: Env,
         usdc_contract: Address,
         from: Address,
-        spending_account: Address,
-        savings_account: Address,
-        bills_account: Address,
-        insurance_account: Address,
+        accounts: AccountGroup,
         total_amount: i128,
     ) -> bool {
         if total_amount <= 0 {
@@ -83,10 +89,10 @@ impl RemittanceSplit {
 
         let amounts = Self::calculate_split(env.clone(), total_amount);
         let recipients = [
-            spending_account,
-            savings_account,
-            bills_account,
-            insurance_account,
+            accounts.spending,
+            accounts.savings,
+            accounts.bills,
+            accounts.insurance,
         ];
         let token = TokenClient::new(&env, &usdc_contract);
 
@@ -116,10 +122,7 @@ impl RemittanceSplit {
 
         let mut result = Vec::new(env);
         for (category, amount) in categories.into_iter().zip(amounts.into_iter()) {
-            result.push_back(Allocation {
-                category,
-                amount,
-            });
+            result.push_back(Allocation { category, amount });
         }
         result
     }
@@ -128,7 +131,11 @@ impl RemittanceSplit {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use soroban_sdk::{testutils::Address as _, token::{StellarAssetClient, TokenClient}, Env};
+    use soroban_sdk::{
+        testutils::Address as _,
+        token::{StellarAssetClient, TokenClient},
+        Env,
+    };
 
     #[test]
     fn distribute_usdc_apportions_tokens_to_recipients() {
@@ -149,15 +156,15 @@ mod tests {
         let bills = Address::generate(&env);
         let insurance = Address::generate(&env);
 
-        let distributed = client.distribute_usdc(
-            &token_contract.address(),
-            &payer,
-            &spending,
-            &savings,
-            &bills,
-            &insurance,
-            &amount,
-        );
+        let accounts = AccountGroup {
+            spending: spending.clone(),
+            savings: savings.clone(),
+            bills: bills.clone(),
+            insurance: insurance.clone(),
+        };
+
+        let distributed =
+            client.distribute_usdc(&token_contract.address(), &payer, &accounts, &amount);
 
         assert!(distributed);
 
