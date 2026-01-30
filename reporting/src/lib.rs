@@ -303,9 +303,9 @@ impl ReportingContract {
             Category::Insurance,
         ];
 
-        for i in 0..4 {
+        for (i, &category) in categories.iter().enumerate() {
             breakdown.push_back(CategoryBreakdown {
-                category: categories[i],
+                category,
                 amount: split_amounts.get(i as u32).unwrap_or(0),
                 percentage: split_percentages.get(i as u32).unwrap_or(0),
             });
@@ -531,7 +531,7 @@ impl ReportingContract {
         // Insurance score (0-20 points)
         let insurance_client = InsuranceClient::new(&env, &addresses.insurance);
         let policies = insurance_client.get_active_policies(&user);
-        let insurance_score = if policies.len() > 0 {
+        let insurance_score = if !policies.is_empty() {
             20
         } else {
             0

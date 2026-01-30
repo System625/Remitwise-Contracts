@@ -1,7 +1,7 @@
 use super::*;
 use soroban_sdk::{
     testutils::{Address as _, Ledger, LedgerInfo},
-    Address, Env, String as SorobanString,
+    Address, Env,
 };
 
 // Mock contracts for testing
