@@ -745,21 +745,29 @@ fn test_create_goal_emits_event() {
         let topic0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
 
         if topic0 == GOAL_CREATED {
-            let event_data: GoalCreatedEvent = GoalCreatedEvent::try_from_val(&env, &event.2).unwrap();
+            let event_data: GoalCreatedEvent =
+                GoalCreatedEvent::try_from_val(&env, &event.2).unwrap();
             assert_eq!(event_data.goal_id, goal_id);
             found_created_struct = true;
         }
 
         if topic0 == symbol_short!("savings") && topics.len() > 1 {
-            let topic1: SavingsEvent = SavingsEvent::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
+            let topic1: SavingsEvent =
+                SavingsEvent::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
             if matches!(topic1, SavingsEvent::GoalCreated) {
                 found_created_enum = true;
             }
         }
     }
 
-    assert!(found_created_struct, "GoalCreated struct event was not emitted");
-    assert!(found_created_enum, "SavingsEvent::GoalCreated was not emitted");
+    assert!(
+        found_created_struct,
+        "GoalCreated struct event was not emitted"
+    );
+    assert!(
+        found_created_enum,
+        "SavingsEvent::GoalCreated was not emitted"
+    );
 }
 
 #[test]
@@ -793,21 +801,26 @@ fn test_add_to_goal_emits_event() {
         let topic0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
 
         if topic0 == FUNDS_ADDED {
-            let event_data: FundsAddedEvent = FundsAddedEvent::try_from_val(&env, &event.2).unwrap();
+            let event_data: FundsAddedEvent =
+                FundsAddedEvent::try_from_val(&env, &event.2).unwrap();
             assert_eq!(event_data.goal_id, goal_id);
             assert_eq!(event_data.amount, 1000);
             found_added_struct = true;
         }
 
         if topic0 == symbol_short!("savings") && topics.len() > 1 {
-            let topic1: SavingsEvent = SavingsEvent::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
+            let topic1: SavingsEvent =
+                SavingsEvent::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
             if matches!(topic1, SavingsEvent::FundsAdded) {
                 found_added_enum = true;
             }
         }
     }
 
-    assert!(found_added_struct, "FundsAdded struct event was not emitted");
+    assert!(
+        found_added_struct,
+        "FundsAdded struct event was not emitted"
+    );
     assert!(found_added_enum, "SavingsEvent::FundsAdded was not emitted");
 }
 
@@ -849,7 +862,8 @@ fn test_goal_completed_emits_event() {
         }
 
         if topic0 == symbol_short!("savings") && topics.len() > 1 {
-            let topic1: SavingsEvent = SavingsEvent::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
+            let topic1: SavingsEvent =
+                SavingsEvent::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
             if matches!(topic1, SavingsEvent::GoalCompleted) {
                 found_completed_enum = true;
             }
@@ -876,7 +890,12 @@ fn test_withdraw_from_goal_emits_event() {
     client.init();
     env.mock_all_auths();
 
-    let goal_id = client.create_goal(&user, &String::from_str(&env, "Withdraw Event"), &5000, &1735689600);
+    let goal_id = client.create_goal(
+        &user,
+        &String::from_str(&env, "Withdraw Event"),
+        &5000,
+        &1735689600,
+    );
     client.unlock_goal(&user, &goal_id);
     client.add_to_goal(&user, &goal_id, &1500);
     client.withdraw_from_goal(&user, &goal_id, &600);
@@ -888,7 +907,8 @@ fn test_withdraw_from_goal_emits_event() {
         let topics = event.1;
         let topic0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
         if topic0 == symbol_short!("savings") && topics.len() > 1 {
-            let topic1: SavingsEvent = SavingsEvent::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
+            let topic1: SavingsEvent =
+                SavingsEvent::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
             if matches!(topic1, SavingsEvent::FundsWithdrawn) {
                 found_withdrawn_enum = true;
             }
@@ -911,7 +931,12 @@ fn test_lock_goal_emits_event() {
     client.init();
     env.mock_all_auths();
 
-    let goal_id = client.create_goal(&user, &String::from_str(&env, "Lock Event"), &5000, &1735689600);
+    let goal_id = client.create_goal(
+        &user,
+        &String::from_str(&env, "Lock Event"),
+        &5000,
+        &1735689600,
+    );
     client.unlock_goal(&user, &goal_id);
     client.lock_goal(&user, &goal_id);
 
@@ -922,14 +947,18 @@ fn test_lock_goal_emits_event() {
         let topics = event.1;
         let topic0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
         if topic0 == symbol_short!("savings") && topics.len() > 1 {
-            let topic1: SavingsEvent = SavingsEvent::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
+            let topic1: SavingsEvent =
+                SavingsEvent::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
             if matches!(topic1, SavingsEvent::GoalLocked) {
                 found_locked_enum = true;
             }
         }
     }
 
-    assert!(found_locked_enum, "SavingsEvent::GoalLocked was not emitted");
+    assert!(
+        found_locked_enum,
+        "SavingsEvent::GoalLocked was not emitted"
+    );
 }
 
 #[test]
@@ -942,7 +971,12 @@ fn test_unlock_goal_emits_event() {
     client.init();
     env.mock_all_auths();
 
-    let goal_id = client.create_goal(&user, &String::from_str(&env, "Unlock Event"), &5000, &1735689600);
+    let goal_id = client.create_goal(
+        &user,
+        &String::from_str(&env, "Unlock Event"),
+        &5000,
+        &1735689600,
+    );
     client.unlock_goal(&user, &goal_id);
 
     let events = env.events().all();
@@ -952,7 +986,8 @@ fn test_unlock_goal_emits_event() {
         let topics = event.1;
         let topic0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
         if topic0 == symbol_short!("savings") && topics.len() > 1 {
-            let topic1: SavingsEvent = SavingsEvent::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
+            let topic1: SavingsEvent =
+                SavingsEvent::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
             if matches!(topic1, SavingsEvent::GoalUnlocked) {
                 found_unlocked_enum = true;
             }
